@@ -1,0 +1,475 @@
+/*
+ * styles.css — all extension styling lives under the .cdx-root class and a
+ * small set of variables set on <html class="cdx-enabled">. Selectors that
+ * touch Canvas's own DOM (.ic-DashboardCard*) are kept to the minimum needed
+ * to hide the banner image and drop in a stats row / colored top border.
+ */
+
+:root {
+  --cdx-accent: #c0392b;
+  --cdx-accent-rgb: 192, 57, 43;
+}
+
+html.cdx-enabled {
+  --cdx-radius: 8px;
+  --cdx-space-unit: 8px;
+  --cdx-font-family: inherit;
+
+  --cdx-bg: #ffffff;
+  --cdx-bg-raised: #f7f7f8;
+  --cdx-text: #1a1a1a;
+  --cdx-text-muted: #5c5f66;
+  --cdx-border: #e2e2e4;
+
+  --cdx-status-done: #0f9d58;
+  --cdx-status-late: #d97706;
+  --cdx-status-missing: #c0392b;
+  --cdx-status-today: #2563eb;
+  --cdx-status-upcoming: #5c5f66;
+}
+
+html.cdx-enabled[data-cdx-mode='dark'] {
+  --cdx-bg: #1c1d20;
+  --cdx-bg-raised: #262729;
+  --cdx-text: #f0f0f0;
+  --cdx-text-muted: #a5a8ad;
+  --cdx-border: #3a3b3e;
+}
+
+html.cdx-enabled[data-cdx-density='compact'] { --cdx-space-unit: 6px; }
+html.cdx-enabled[data-cdx-density='comfortable'] { --cdx-space-unit: 8px; }
+
+html.cdx-enabled[data-cdx-radius='sharp'] { --cdx-radius: 2px; }
+html.cdx-enabled[data-cdx-radius='soft'] { --cdx-radius: 8px; }
+html.cdx-enabled[data-cdx-radius='round'] { --cdx-radius: 18px; }
+
+html.cdx-enabled[data-cdx-font='serif'] { --cdx-font-family: Georgia, 'Times New Roman', serif; }
+html.cdx-enabled[data-cdx-font='mono'] { --cdx-font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace; }
+
+/* ---------- Widget shell ---------- */
+
+.cdx-root {
+  box-sizing: border-box;
+  font-family: var(--cdx-font-family);
+  color: var(--cdx-text);
+}
+.cdx-root *, .cdx-root *::before, .cdx-root *::after {
+  box-sizing: border-box;
+}
+
+.cdx-widget {
+  background: var(--cdx-bg);
+  border: 1px solid var(--cdx-border);
+  border-radius: var(--cdx-radius);
+  padding: calc(var(--cdx-space-unit) * 2);
+  margin: calc(var(--cdx-space-unit) * 2) 0;
+  max-width: 900px;
+}
+
+html.cdx-enabled[data-cdx-background='solid'] .cdx-widget {
+  background: var(--cdx-bg-raised);
+}
+html.cdx-enabled[data-cdx-background='tint'] .cdx-widget {
+  background: linear-gradient(0deg, rgba(var(--cdx-accent-rgb), 0.05), rgba(var(--cdx-accent-rgb), 0.05)), var(--cdx-bg);
+}
+
+.cdx-widget__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cdx-space-unit);
+  flex-wrap: wrap;
+}
+
+.cdx-tabs {
+  display: flex;
+  gap: 2px;
+  background: var(--cdx-bg-raised);
+  border-radius: var(--cdx-radius);
+  padding: 2px;
+}
+.cdx-tab {
+  border: none;
+  background: transparent;
+  color: var(--cdx-text-muted);
+  padding: calc(var(--cdx-space-unit) * 0.75) calc(var(--cdx-space-unit) * 1.25);
+  border-radius: calc(var(--cdx-radius) - 2px);
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+.cdx-tab[aria-selected='true'] {
+  background: var(--cdx-bg);
+  color: var(--cdx-text);
+  font-weight: 600;
+}
+
+.cdx-header-actions {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--cdx-space-unit) * 1.5);
+}
+
+.cdx-streak {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.875rem;
+  color: var(--cdx-text-muted);
+}
+.cdx-streak__icon {
+  color: var(--cdx-accent);
+  font-size: 0.6em;
+}
+html.cdx-hide-streak .cdx-streak { display: none; }
+
+.cdx-settings-btn, .cdx-btn {
+  border: 1px solid var(--cdx-border);
+  background: var(--cdx-bg);
+  color: var(--cdx-text);
+  border-radius: var(--cdx-radius);
+  padding: calc(var(--cdx-space-unit) * 0.5) calc(var(--cdx-space-unit) * 0.75);
+  cursor: pointer;
+  font-size: 0.9rem;
+  line-height: 1;
+}
+.cdx-btn--primary {
+  background: var(--cdx-accent);
+  border-color: var(--cdx-accent);
+  color: #fff;
+}
+
+.cdx-root button:focus-visible,
+.cdx-root input:focus-visible,
+.cdx-root select:focus-visible,
+.cdx-root a:focus-visible {
+  outline: 2px solid var(--cdx-accent);
+  outline-offset: 2px;
+}
+
+.cdx-error {
+  margin-top: var(--cdx-space-unit);
+  padding: calc(var(--cdx-space-unit) * 0.75) var(--cdx-space-unit);
+  background: rgba(var(--cdx-accent-rgb), 0.08);
+  color: var(--cdx-text);
+  border-left: 3px solid var(--cdx-status-missing);
+  border-radius: calc(var(--cdx-radius) - 2px);
+  font-size: 0.875rem;
+}
+
+.cdx-widget__body {
+  display: flex;
+  gap: calc(var(--cdx-space-unit) * 2.5);
+  margin-top: calc(var(--cdx-space-unit) * 2);
+  flex-wrap: wrap;
+}
+
+/* ---------- Ring ---------- */
+
+.cdx-ring-wrap {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+}
+html.cdx-hide-ring .cdx-ring-wrap { display: none; }
+
+.cdx-ring {
+  transform: rotate(-90deg);
+}
+.cdx-ring__track {
+  fill: none;
+  stroke: var(--cdx-border);
+  stroke-width: 6;
+}
+.cdx-ring__fill {
+  fill: none;
+  stroke: var(--cdx-accent);
+  stroke-width: 6;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 150ms ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cdx-ring__fill { transition: none; }
+}
+
+.cdx-ring-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.cdx-ring-label.is-empty {
+  color: var(--cdx-text-muted);
+  font-weight: 400;
+}
+
+/* ---------- Task list ---------- */
+
+.cdx-task-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex: 1 1 320px;
+  min-width: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--cdx-space-unit) * 0.75);
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.cdx-task {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--cdx-space-unit);
+  padding: calc(var(--cdx-space-unit) * 0.5) 0;
+  border-bottom: 1px solid var(--cdx-border);
+}
+.cdx-task:last-child { border-bottom: none; }
+
+.cdx-task__checkbox {
+  margin-top: 3px;
+  width: 16px;
+  height: 16px;
+  accent-color: var(--cdx-accent);
+  flex-shrink: 0;
+}
+
+.cdx-task__main {
+  flex: 1;
+  min-width: 0;
+}
+.cdx-task__title-row {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--cdx-space-unit) * 0.75);
+}
+.cdx-task__title {
+  font-size: 0.9rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cdx-task--done .cdx-task__title,
+.cdx-task--late .cdx-task__title {
+  color: var(--cdx-text-muted);
+  text-decoration: line-through;
+}
+
+.cdx-task__meta {
+  font-size: 0.75rem;
+  color: var(--cdx-text-muted);
+  margin-top: 2px;
+}
+
+.cdx-task__actions {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.cdx-task__delete, .cdx-task__edit {
+  border: none;
+  background: transparent;
+  color: var(--cdx-text-muted);
+  cursor: pointer;
+  font-size: 0.9rem;
+  line-height: 1;
+  padding: 2px 4px;
+}
+.cdx-task__delete:hover { color: var(--cdx-status-missing); }
+.cdx-task__edit:hover { color: var(--cdx-accent); }
+
+.cdx-edit-task {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+.cdx-edit-task input,
+.cdx-edit-task select {
+  border: 1px solid var(--cdx-border);
+  background: var(--cdx-bg);
+  color: var(--cdx-text);
+  border-radius: var(--cdx-radius);
+  padding: 4px 6px;
+  font-size: 0.8rem;
+  font-family: inherit;
+}
+.cdx-edit-task__title { flex: 1 1 140px; }
+
+.cdx-task--empty {
+  color: var(--cdx-text-muted);
+  font-size: 0.875rem;
+  border-bottom: none;
+}
+
+.cdx-task--skeleton { border-bottom: none; }
+
+.cdx-skeleton-line {
+  display: inline-block;
+  height: 0.9em;
+  border-radius: 4px;
+  background: var(--cdx-border);
+  opacity: 0.6;
+}
+
+.cdx-pill {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 1px 6px;
+  border-radius: 999px;
+  flex-shrink: 0;
+  color: #fff;
+}
+.cdx-pill--done { background: var(--cdx-status-done); }
+.cdx-pill--late { background: var(--cdx-status-late); }
+.cdx-pill--missing { background: var(--cdx-status-missing); }
+.cdx-pill--due-today { background: var(--cdx-status-today); }
+.cdx-pill--upcoming { background: var(--cdx-text-muted); }
+
+/* ---------- Add task form ---------- */
+
+.cdx-add-task {
+  flex-basis: 100%;
+  display: flex;
+  gap: var(--cdx-space-unit);
+  flex-wrap: wrap;
+  border-top: 1px solid var(--cdx-border);
+  padding-top: calc(var(--cdx-space-unit) * 1.5);
+}
+.cdx-add-task__title {
+  flex: 1 1 200px;
+}
+.cdx-add-task input,
+.cdx-add-task select {
+  border: 1px solid var(--cdx-border);
+  background: var(--cdx-bg);
+  color: var(--cdx-text);
+  border-radius: var(--cdx-radius);
+  padding: calc(var(--cdx-space-unit) * 0.5);
+  font-size: 0.85rem;
+  font-family: inherit;
+}
+
+/* ---------- Settings dialog ---------- */
+
+.cdx-settings-dialog {
+  border: 1px solid var(--cdx-border);
+  border-radius: var(--cdx-radius);
+  padding: calc(var(--cdx-space-unit) * 2.5);
+  background: var(--cdx-bg);
+  color: var(--cdx-text);
+  max-width: 420px;
+  width: 90vw;
+}
+.cdx-settings-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.4);
+}
+.cdx-settings-heading {
+  margin: 0 0 calc(var(--cdx-space-unit) * 2);
+  font-size: 1.1rem;
+}
+.cdx-settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--cdx-space-unit) * 1.5);
+}
+.cdx-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cdx-space-unit);
+  font-size: 0.875rem;
+}
+.cdx-field__label { color: var(--cdx-text-muted); }
+.cdx-select, .cdx-hex-input {
+  border: 1px solid var(--cdx-border);
+  background: var(--cdx-bg);
+  color: var(--cdx-text);
+  border-radius: var(--cdx-radius);
+  padding: 4px 8px;
+  font-family: inherit;
+}
+.cdx-hex-input { width: 5.5em; }
+
+.cdx-accent-row {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--cdx-space-unit) * 0.75);
+}
+.cdx-swatches {
+  display: flex;
+  gap: 4px;
+}
+.cdx-swatch {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  background: var(--cdx-swatch-color);
+  cursor: pointer;
+  padding: 0;
+}
+.cdx-swatch.is-active {
+  border-color: var(--cdx-text);
+}
+
+.cdx-toggle-group {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--cdx-space-unit) * 0.75);
+}
+.cdx-checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--cdx-accent);
+}
+
+.cdx-settings-close-row {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ---------- Course card augmentation (minimal Canvas DOM touch) ---------- */
+
+.cdx-course-card {
+  border-top: 3px solid var(--cdx-course-color, var(--cdx-accent)) !important;
+}
+
+/* Overriding Canvas's own inline/compiled banner styling needs !important;
+   there is no selector we can use here with equal-or-higher specificity. */
+html.cdx-hide-course-images .ic-DashboardCard__header_image,
+html.cdx-hide-course-images .ic-DashboardCard__header_hero {
+  display: none !important;
+}
+
+.cdx-course-stats {
+  display: flex;
+  gap: 6px;
+  padding: 4px 8px;
+  font-size: 0.7rem;
+  font-family: var(--cdx-font-family, inherit);
+}
+.cdx-course-stat {
+  background: var(--cdx-bg-raised, #f0f0f0);
+  color: var(--cdx-text, #333);
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+.cdx-course-stat--missing {
+  color: var(--cdx-status-missing, #c0392b);
+}
+
+/* ---------- Reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .cdx-root * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
