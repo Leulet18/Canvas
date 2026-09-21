@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "AUBG Canvas Dashboard",
+  "version": "1.0.0",
+  "description": "A quieter, faster dashboard for aubg.instructure.com: task status, a progress ring, streaks and per-course stats. No tracking, no external servers.",
+  "permissions": ["storage"],
+  "host_permissions": ["https://aubg.instructure.com/*"],
+  "content_scripts": [
+    {
+      "matches": ["https://aubg.instructure.com/*"],
+      "js": ["state.js", "api.js", "theme.js", "content.js"],
+      "css": ["styles.css"],
+      "run_at": "document_idle"
+    }
+  ]
+}
