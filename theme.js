@@ -45,6 +45,14 @@
     var rgb = hexToRgb(settings.accent);
     style.setProperty('--cdx-accent', settings.accent);
     style.setProperty('--cdx-accent-rgb', rgb.r + ',' + rgb.g + ',' + rgb.b);
+
+    var useImage = settings.background === 'image' && global.CDX_BACKGROUND_DATA_URI;
+    html.classList.toggle('cdx-bg-image', !!useImage);
+    if (useImage) {
+      style.setProperty('--cdx-bg-image', 'url("' + global.CDX_BACKGROUND_DATA_URI + '")');
+    } else {
+      style.removeProperty('--cdx-bg-image');
+    }
   }
 
   function buildAccentPresetButtons(container, current, onPick) {
@@ -152,7 +160,8 @@
     var bgSelect = select([
       { value: 'none', label: 'Canvas default' },
       { value: 'tint', label: 'Subtle tint' },
-      { value: 'solid', label: 'Solid color' }
+      { value: 'solid', label: 'Solid color' },
+      { value: 'image', label: 'Custom photo' }
     ], settings.background);
     bgSelect.addEventListener('change', function () { onChange({ background: bgSelect.value }); });
     form.appendChild(field('Background', bgSelect));

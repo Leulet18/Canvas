@@ -73,6 +73,16 @@ html.cdx-enabled[data-cdx-background='tint'] .cdx-widget {
   background: linear-gradient(0deg, rgba(var(--cdx-accent-rgb), 0.05), rgba(var(--cdx-accent-rgb), 0.05)), var(--cdx-bg);
 }
 
+/* Full-page background photo. The widget and Canvas's own cards keep an
+   opaque background (set above/elsewhere) so text stays readable on top. */
+html.cdx-enabled.cdx-bg-image body {
+  background-image: var(--cdx-bg-image);
+  background-size: cover;
+  background-position: center center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+}
+
 .cdx-widget__header {
   display: flex;
   align-items: center;
@@ -107,6 +117,16 @@ html.cdx-enabled[data-cdx-background='tint'] .cdx-widget {
   display: flex;
   align-items: center;
   gap: calc(var(--cdx-space-unit) * 1.5);
+}
+
+.cdx-sort-select {
+  border: 1px solid var(--cdx-border);
+  background: var(--cdx-bg);
+  color: var(--cdx-text);
+  border-radius: var(--cdx-radius);
+  padding: calc(var(--cdx-space-unit) * 0.4) calc(var(--cdx-space-unit) * 0.6);
+  font-size: 0.8rem;
+  font-family: inherit;
 }
 
 .cdx-streak {
@@ -204,6 +224,57 @@ html.cdx-hide-ring .cdx-ring-wrap { display: none; }
 .cdx-ring-label.is-empty {
   color: var(--cdx-text-muted);
   font-weight: 400;
+}
+
+/* ---------- Week strip ---------- */
+
+.cdx-week-strip {
+  display: flex;
+  gap: 4px;
+  flex-basis: 100%;
+  margin-top: calc(var(--cdx-space-unit) * -0.5);
+}
+
+.cdx-week-day {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: calc(var(--cdx-space-unit) * 0.5) 2px;
+  border-radius: calc(var(--cdx-radius) - 2px);
+  background: var(--cdx-bg-raised);
+}
+.cdx-week-day.is-today {
+  outline: 1px solid var(--cdx-accent);
+  outline-offset: -1px;
+}
+.cdx-week-day__label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  color: var(--cdx-text-muted);
+  letter-spacing: 0.03em;
+}
+.cdx-week-day__num {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.cdx-week-day__badge {
+  min-width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  font-size: 0.6rem;
+  line-height: 14px;
+  text-align: center;
+  color: var(--cdx-text-muted);
+}
+.cdx-week-day.has-tasks .cdx-week-day__badge {
+  background: var(--cdx-border);
+  color: var(--cdx-text);
+}
+.cdx-week-day.has-missing .cdx-week-day__badge {
+  background: var(--cdx-status-missing);
+  color: #fff;
 }
 
 /* ---------- Task list ---------- */

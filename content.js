@@ -12,6 +12,7 @@
 
   var state = {
     range: 'week',
+    sort: 'priority', // 'priority' | 'due' | 'course'
     tasks: [], // normalized, merged canvas + custom
     overrides: {},
     courses: [], // { id, name, grade }
@@ -70,6 +71,24 @@
     header.appendChild(tabs);
 
     var actions = el('div', 'cdx-header-actions');
+
+    var sortSelect = el('select', 'cdx-sort-select', { 'aria-label': 'Sort tasks by' });
+    [
+      { value: 'priority', label: 'Sort: Priority' },
+      { value: 'due', label: 'Sort: Due date' },
+      { value: 'course', label: 'Sort: Course' }
+    ].forEach(function (opt) {
+      var o = el('option', null, { value: opt.value });
+      o.textContent = opt.label;
+      sortSelect.appendChild(o);
+    });
+    sortSelect.value = state.sort;
+    sortSelect.addEventListener('change', function () {
+      state.sort = sortSelect.value;
+      render();
+    });
+    actions.appendChild(sortSelect);
+
     var streakBtn = el('div', 'cdx-streak', { title: 'Current streak', 'aria-live': 'polite' });
     streakBtn.innerHTML = '<span class="cdx-streak__icon" aria-hidden="true">&#9679;</span><span class="cdx-streak__count">0</span>';
     actions.appendChild(streakBtn);
@@ -86,6 +105,17 @@
     root.appendChild(errorBox);
 
     var body = el('div', 'cdx-widget__body');
+
+    var weekStrip = el('div', 'cdx-week-strip', { 'aria-label': 'Next 7 days' });
+    for (var w = 0; w < 7; w++) {
+      var dayEl = el('div', 'cdx-week-day');
+      dayEl.innerHTML =
+        '<span class="cdx-week-day__label"></span>' +
+        '<span class="cdx-week-day__num"></span>' +
+        '<span class="cdx-week-day__badge"></span>';
+      weekStrip.appendChild(dayEl);
+    }
+    body.appendChild(weekStrip);
 
     var ringWrap = el('div', 'cdx-ring-wrap');
     ringWrap.innerHTML =
@@ -111,6 +141,7 @@
 
     els.root = root;
     els.tabs = tabs;
+    els.weekStrip = weekStrip;
     els.streakCount = streakBtn.querySelector('.cdx-streak__count');
     els.errorBox = errorBox;
     els.ringFill = ringWrap.querySelector('.cdx-ring__fill');
@@ -422,11 +453,23 @@
     var withStatus = inRange.map(function (t) {
       return { task: t, status: S.deriveStatus(t, state.overrides, now) };
     }).filter(function (x) { return x.status !== 'no-date'; });
-    withStatus.sort(function (a, b) {
-      var so = (statusOrder[a.status] - statusOrder[b.status]);
-      if (so !== 0) return so;
-      return new Date(a.task.dueAt) - new Date(b.task.dueAt);
-    });
+
+    if (state.sort === 'due') {
+      withStatus.sort(function (a, b) { return new Date(a.task.dueAt) - new Date(b.task.dueAt); });
+    } else if (state.sort === 'course') {
+      withStatus.sort(function (a, b) {
+        var an = a.task.courseName || '';
+        var bn = b.task.courseName || '';
+        if (an !== bn) return an.localeCompare(bn);
+        return new Date(a.task.dueAt) - new Date(b.task.dueAt);
+      });
+    } else {
+      withStatus.sort(function (a, b) {
+        var so = (statusOrder[a.status] - statusOrder[b.status]);
+        if (so !== 0) return so;
+        return new Date(a.task.dueAt) - new Date(b.task.dueAt);
+      });
+    }
 
     var total = withStatus.length;
     var done = withStatus.filter(function (x) { return S.isCompletedStatus(x.status); }).length;
@@ -485,7 +528,36 @@
 
     populateCourseSelect();
     renderStreak();
+    renderWeekStrip();
     renderCourseCards(withStatusForCourses());
+  }
+
+  function renderWeekStrip() {
+    var now = new Date();
+    var todayStart = S.startOfDay(now);
+    var dayEls = els.weekStrip.querySelectorAll('.cdx-week-day');
+    for (var i = 0; i < dayEls.length; i++) {
+      var d = new Date(todayStart);
+      d.setDate(d.getDate() + i);
+      var dayEnd = S.endOfDay(d);
+      var count = 0;
+      var hasMissing = false;
+      state.tasks.forEach(function (t) {
+        if (!t.dueAt) return;
+        var due = new Date(t.dueAt);
+        if (due >= d && due <= dayEnd) {
+          count++;
+          if (S.deriveStatus(t, state.overrides, now) === 'missing') hasMissing = true;
+        }
+      });
+      var dayEl = dayEls[i];
+      dayEl.querySelector('.cdx-week-day__label').textContent = d.toLocaleDateString(undefined, { weekday: 'short' }).slice(0, 2);
+      dayEl.querySelector('.cdx-week-day__num').textContent = String(d.getDate());
+      dayEl.querySelector('.cdx-week-day__badge').textContent = count > 0 ? String(count) : '';
+      dayEl.classList.toggle('is-today', i === 0);
+      dayEl.classList.toggle('has-tasks', count > 0);
+      dayEl.classList.toggle('has-missing', hasMissing);
+    }
   }
 
   function withStatusForCourses() {

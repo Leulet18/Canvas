@@ -23,8 +23,8 @@
     mode: 'follow-system', // 'light' | 'dark' | 'follow-system'
     accent: '#c0392b',
     accentPreset: 'crimson',
-    background: 'none', // 'solid' | 'tint' | 'none'
-    font: 'system', // 'system' | 'serif' | 'mono'
+    background: 'image', // 'solid' | 'tint' | 'none' | 'image'
+    font: 'serif', // 'system' | 'serif' | 'mono'
     density: 'comfortable', // 'compact' | 'comfortable'
     radius: 'soft', // 'sharp' | 'soft' | 'round'
     showStreak: true,
